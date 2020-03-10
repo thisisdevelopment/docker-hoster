@@ -60,7 +60,16 @@ def get_container_data(dockerClient, container_id):
     #extract all the info with the docker api
     info = dockerClient.inspect_container(container_id)
     container_hostname = info["Config"]["Hostname"]
-    container_name = info["Name"].strip("/")
+    if info["Config"]["Domainname"]:
+        container_hostname = container_hostname + "." + info["Config"]["Domainname"]
+    else:
+        container_hostname = container_hostname + ".containers.docker"
+
+    if info["Config"]["Labels"] and info["Config"]["Labels"]["com.docker.compose.project"]:
+        container_name = info["Config"]["Labels"]["com.docker.compose.service"] + "." + info["Config"]["Labels"]["com.docker.compose.project"] + ".services.docker"
+    else:    
+        container_name = info["Name"].strip("/") + ".containers.docker"
+    
     container_ip = info["NetworkSettings"]["IPAddress"]
     
     result = []
@@ -69,15 +78,14 @@ def get_container_data(dockerClient, container_id):
         
         if not values["Aliases"]: 
             continue
-
+    
         result.append({
-                "ip": values["IPAddress"] , 
-                "name": container_name,
-                "domains": set(values["Aliases"] + [container_name, container_hostname])
+                "ip": values["IPAddress"], 
+                "domains": set(list(filter(lambda x: "." in x, values["Aliases"])) + [container_name, container_hostname])
             })
 
     if container_ip:
-        result.append({"ip": container_ip, "name": container_name, "domains": [container_name, container_hostname ]})
+        result.append({"ip": container_ip, "domains": [container_name, container_hostname]})
 
     return result
 
