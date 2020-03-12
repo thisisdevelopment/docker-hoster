@@ -62,7 +62,7 @@ def get_container_data(dockerClient, container_id):
     container_hostname = info["Config"]["Hostname"]
     if info["Config"]["Domainname"]:
         container_hostname = container_hostname + "." + info["Config"]["Domainname"]
-    else:
+    elif not "." in container_hostname:
         container_hostname = container_hostname + ".containers.docker"
 
     if info["Config"]["Labels"] and info["Config"]["Labels"]["com.docker.compose.project"]:
