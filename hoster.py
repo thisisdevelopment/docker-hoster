@@ -60,13 +60,13 @@ def get_container_data(dockerClient, container_id):
     #extract all the info with the docker api
     info = dockerClient.inspect_container(container_id)
     container_hostname = info["Config"]["Hostname"]
-    if info["Config"]["Domainname"]:
-        container_hostname = container_hostname + "." + info["Config"]["Domainname"]
-    elif not "." in container_hostname:
-        container_hostname = container_hostname + ".containers.docker"
+    container_domainname = info["Config"].get("Domainname", "containers.docker")
+    if not "." in container_hostname:
+        container_hostname = container_hostname + "." + container_domainname
 
-    if info["Config"]["Labels"] and info["Config"]["Labels"]["com.docker.compose.project"]:
-        container_name = info["Config"]["Labels"]["com.docker.compose.service"] + "." + info["Config"]["Labels"]["com.docker.compose.project"] + ".services.docker"
+    compose_project = info["Config"].get("Labels", {}).get("com.docker.compose.project")
+    if compose_project:
+        container_name = info["Config"]["Labels"]["com.docker.compose.service"] + "." + compose_project + ".services.docker"
     else:    
         container_name = info["Name"].strip("/") + ".containers.docker"
     

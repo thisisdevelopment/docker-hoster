@@ -4,10 +4,10 @@ A simple "etc/hosts" file injection tool to resolve names of local Docker contai
 
 hoster is intended to run in a Docker container:
 
-    docker run --restart=unless-stopped -d \
-        -v /var/run/docker.sock:/tmp/docker.sock \
-        -v /etc/hosts:/tmp/hosts \
-        thisisdevelopment/docker-hoster
+```shell
+docker stop docker-hoster
+docker run --name docker-hoster --restart=unless-stopped -d -v /var/run/docker.sock:/tmp/docker.sock -v /etc/hosts:/tmp/hosts thisisdevelopment/docker-hoster
+```
 
 The `docker.sock` is mounted to allow hoster to listen for Docker events and automatically register containers IP.
 
