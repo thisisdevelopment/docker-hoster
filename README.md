@@ -6,6 +6,7 @@ hoster is intended to run in a Docker container:
 
 ```shell
 docker stop docker-hoster
+docker rm docker-hoster
 docker run --name docker-hoster --restart=unless-stopped -d -v /var/run/docker.sock:/tmp/docker.sock -v /etc/hosts:/tmp/hosts thisisdevelopment/docker-hoster
 ```
 
@@ -16,10 +17,12 @@ Hoster inserts into the host's `/etc/hosts` file an entry per running container 
 ## Container Registration
 
 Hoster provides by default the entries 
-- `<hostname>.<domainname>`
+- `<hostname>.<domainname>` (or `<hostname>.hosts.docker` if no domainname is present)
 - `<service>.<project>.services.docker`
 - `<container name>.containers.docker` (if no service/project name are found)
-- `<container id>` for each container and the aliases for each network. Containers are automatically registered when they start, and removed when they die.
+- `<alias>` for each network alias
+
+Containers are automatically registered when they start, and removed when they die.
 
 ## Original code from
 
